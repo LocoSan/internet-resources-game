@@ -1,0 +1,33 @@
+name: Docker and PostgreSQL
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure temporary secrets
+        shell: bash
+        run: |
+          cp .env.example .env
+          python -c "import secrets; from pathlib import Path; p = Path('.env'); p.write_text(p.read_text().replace('DJANGO_SECRET_KEY=', 'DJANGO_SECRET_KEY=' + secrets.token_urlsafe(48)).replace('POSTGRES_PASSWORD=', 'POSTGRES_PASSWORD=' + secrets.token_urlsafe(32)))"
+      - name: Build and start
+        run: docker compose up --build -d --wait
+      - name: Check homepage and run tests
+        run: |
+          curl --fail --silent http://127.0.0.1:8000/ | grep -q 'The Game'
+          docker compose exec -T web python manage.py makemigrations --check --dry-run
+          docker compose exec -T web python manage.py test --verbosity 2
+      - name: Logs
+        if: failure()
+        run: docker compose logs
+      - name: Stop services
+        if: always()
+        run: docker compose down -v

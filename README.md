@@ -54,3 +54,14 @@ docker compose down
 | GET `/api/achievements/` | Мои достижения |
 | GET `/api/items/` | Магазин и купленные предметы |
 | POST `/api/items/{id}/buy/` | Покупка за игровые монеты |
+
+## Тесты
+
+```powershell
+.\.venv\Scripts\python.exe manage.py test
+.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt
+.\.venv\Scripts\python.exe -m coverage run --source=game,richgame manage.py test
+.\.venv\Scripts\python.exe -m coverage report --omit "*/migrations/*"
+```
+
+В Docker: `docker compose exec web python manage.py test`. Результаты и ручной чек-лист — в [TESTING.md](TESTING.md).
