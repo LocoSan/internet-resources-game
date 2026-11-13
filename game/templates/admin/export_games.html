@@ -1,0 +1,11 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% for pk in selected %}<input type="hidden" name="_selected_action" value="{{ pk }}">{% endfor %}
+  <input type="hidden" name="select_across" value="{{ select_across }}">
+  <input type="hidden" name="action" value="export_xlsx">
+  <input type="submit" name="export" value="Скачать XLSX" class="default">
+</form>
+{% endblock %}

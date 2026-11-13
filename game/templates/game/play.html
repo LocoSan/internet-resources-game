@@ -1,0 +1,20 @@
+{% extends "game/base.html" %}
+{% block content %}
+<h1>Игра</h1>
+<p>Игрок: {{ request.user.username }}. Монеты: {{ profile.coins }}.</p>
+<section class="panel">
+  <h2>Новая игра</h2>
+  <form method="post">{% csrf_token %}{{ form.as_p }}<button>Начать</button></form>
+</section>
+<section class="panel">
+  <h2>Сохранения</h2>
+  {% for game in sessions %}
+    <article class="row">
+      <div>{{ game.get_difficulty_display }}, {{ game.score }} очков{% if game.is_completed %} — завершена{% endif %}
+        <br><a href="{% url 'session' game.pk %}">{% if forloop.first %}Открыть последнее сохранение{% else %}Открыть{% endif %}</a>
+      </div>
+      <form method="post" action="{% url 'delete' game.pk %}">{% csrf_token %}<button class="secondary">Удалить</button></form>
+    </article>
+  {% empty %}<p>У вас пока нет сохранений.</p>{% endfor %}
+</section>
+{% endblock %}

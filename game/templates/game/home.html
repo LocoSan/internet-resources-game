@@ -1,0 +1,12 @@
+{% extends "game/base.html" %}
+{% block content %}
+<section class="panel">
+  <h1>Богатей. The Game</h1>
+  <p>Нажимайте на монету, зарабатывайте очки и покупайте предметы, чтобы получать больше монет за клик.</p>
+  {% if user.is_authenticated %}
+    <a class="button" href="{% url 'play' %}">К игре</a>
+  {% else %}
+    <a class="button" href="{% url 'register' %}">Создать аккаунт</a>
+  {% endif %}
+</section>
+{% endblock %}

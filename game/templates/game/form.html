@@ -1,0 +1,16 @@
+{% extends "game/base.html" %}
+{% block title %}{{ title }} — Богатей{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>{{ title }}</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button>{{ submit }}</button>
+  </form>
+  {% if request.resolver_match.url_name == "edit_profile" %}
+    <p><a href="{% url 'profile' user.username %}">Посмотреть публичный профиль</a></p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "game/base.html" %}
+{% block content %}
+<h1>Магазин предметов</h1>
+<p>Ваш баланс: <strong>{{ profile.coins }}</strong> монет.</p>
+{% for item in items %}
+  <section class="panel">
+    <h2>{{ item.name }}</h2>
+    <p>{{ item.description }} Бонус: +{{ item.click_bonus }} за клик.</p>
+    {% if item.pk in owned %}<p>Уже куплен</p>
+    {% else %}
+      <form method="post" action="{% url 'buy' item.pk %}">{% csrf_token %}
+        <button>Купить за {{ item.price }} монет</button>
+      </form>
+    {% endif %}
+  </section>
+{% empty %}<p>Предметов пока нет. Выполните команду seed_game из README.</p>{% endfor %}
+{% endblock %}

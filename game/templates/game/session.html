@@ -1,0 +1,21 @@
+{% extends "game/base.html" %}
+{% load static %}
+{% block content %}
+<section class="panel">
+  <h1>Монетный кликер</h1>
+  <p>Сложность: {{ game.get_difficulty_display }}</p>
+  <p>Очки: <strong id="score">{{ game.score }}</strong> · Уровень: <strong id="level">{{ game.level }}</strong></p>
+  <p>Клики: <strong id="clicks">{{ game.game_state.clicks|default:0 }}</strong> · Монеты: <strong id="coins">{{ game.player.coins }}</strong></p>
+  {% if game.is_completed %}
+    <p>Игра завершена.</p>
+  {% else %}
+    <form id="coin-form" method="post" action="{% url 'click' game.pk %}">
+      {% csrf_token %}<button class="coin" aria-label="Собрать монету">₽</button>
+    </form>
+    <p id="game-status" role="status">Прогресс сохраняется после каждого клика.</p>
+    <form method="post" action="{% url 'finish' game.pk %}">{% csrf_token %}<button class="secondary">Завершить игру</button></form>
+    <script src="{% static 'game/play.js' %}" defer></script>
+  {% endif %}
+  <p><a href="{% url 'play' %}">К сохранениям</a></p>
+</section>
+{% endblock %}
