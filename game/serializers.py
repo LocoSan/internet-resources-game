@@ -69,6 +69,14 @@ class OwnProfileSerializer(PublicProfileSerializer):
         except DjangoValidationError as error:
             raise serializers.ValidationError(error.messages) from error
 
+    def update(self, instance, validated_data):
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        if validated_data:
+            instance.save(update_fields=[*validated_data, "updated_at"])
+        instance.refresh_from_db(fields=["coins"])
+        return instance
+
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,6 +87,7 @@ class GameSerializer(serializers.ModelSerializer):
 
 class LeaderboardSerializer(serializers.ModelSerializer):
     player = serializers.CharField(source="player.user.username", read_only=True)
+    rank = serializers.IntegerField(source="current_rank", read_only=True)
 
     class Meta:
         model = Leaderboard

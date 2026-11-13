@@ -1,5 +1,6 @@
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Count, OuterRef, Q, Subquery, Sum
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 
@@ -14,7 +15,14 @@ def profile_for(user):
 
 
 def leaderboard(difficulty="", since=""):
-    rows = Leaderboard.objects.select_related("player__user")
+    better = Leaderboard.objects.filter(difficulty=OuterRef("difficulty")).filter(
+        Q(score__gt=OuterRef("score"))
+        | Q(score=OuterRef("score"), date_achieved__lt=OuterRef("date_achieved"))
+        | Q(score=OuterRef("score"), date_achieved=OuterRef("date_achieved"), pk__lt=OuterRef("pk"))
+    ).order_by().values("difficulty").annotate(total=Count("pk")).values("total")
+    rows = Leaderboard.objects.select_related("player__user").annotate(
+        current_rank=Coalesce(Subquery(better), 0) + 1,
+    )
     if difficulty in Difficulty.values:
         rows = rows.filter(difficulty=difficulty)
     try:
@@ -70,13 +78,9 @@ def finish_game(game):
         record.date_achieved = timezone.now()
         record.save(update_fields=["score", "date_achieved", "updated_at"])
 
-    changed = []
-    for rank, row in enumerate(Leaderboard.objects.filter(difficulty=game.difficulty), start=1):
-        if row.rank != rank:
-            row.rank = rank
-            row.updated_at = timezone.now()
-            changed.append(row)
-    Leaderboard.objects.bulk_update(changed, ["rank", "updated_at"])
+    # Сохраняем место на момент рекорда, публичный рейтинг показывает текущее.
+    record.rank = leaderboard(game.difficulty).get(pk=record.pk).current_rank
+    record.save(update_fields=["rank", "updated_at"])
     return game
 
 

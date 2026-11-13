@@ -12,6 +12,7 @@ nav { display: flex; flex-wrap: wrap; gap: .65rem 1rem; align-items: center; pad
 nav a { color: white; }
 .brand { font-weight: 750; color: #ffdb73; }
 main { padding-block: 1.4rem 3rem; }
+.panel { overflow-wrap: anywhere; }
 .panel { background: white; border: 1px solid #dedeee; border-radius: .65rem; padding: 1.15rem; margin-bottom: 1rem; }
 h1, h2 { margin-top: 0; line-height: 1.25; }
 a { color: #4339a1; }

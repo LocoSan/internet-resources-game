@@ -64,7 +64,7 @@ class Leaderboard(TimeStampedModel):
     player = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="records")
     difficulty = models.CharField("сложность", max_length=6, choices=Difficulty.choices)
     score = models.PositiveIntegerField("очки")
-    rank = models.PositiveIntegerField("место", default=1, validators=[MinValueValidator(1)])
+    rank = models.PositiveIntegerField("место на момент рекорда", default=1, validators=[MinValueValidator(1)])
     date_achieved = models.DateTimeField("дата рекорда", default=timezone.now)
 
     class Meta:

@@ -25,6 +25,12 @@ class ProfileForm(forms.ModelForm):
     def clean_avatar(self):
         return validate_avatar(self.cleaned_data.get("avatar"))
 
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        if commit and self.changed_data:
+            profile.save(update_fields=[*self.changed_data, "updated_at"])
+        return profile
+
 
 class GameForm(forms.ModelForm):
     class Meta:
